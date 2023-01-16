@@ -1,0 +1,105 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Comments {
+  id: Float!
+  text: String!
+  userId: Float
+  postsId: Float
+  createdAt: String!
+  updatedAt: String!
+  parentId: Float
+  reply: Comments
+}
+
+type Users {
+  name: String!
+  email: String!
+  password: String!
+  createdAt: String!
+  updatedAt: String!
+  roles: Role
+}
+
+"""user's role"""
+enum Role {
+  User
+  Admin
+}
+
+type Posts {
+  id: Float!
+  text: String!
+  userId: Float
+  createdAt: String!
+  updatedAt: String!
+  comments: [Comments]
+}
+
+type CreatePostsResponsePayload {
+  status: Float!
+  message: String!
+}
+
+type ResponseObject {
+  message: String
+  error: String
+  status: Int
+}
+
+type PostPayload {
+  response: ResponseObject
+  post: Posts
+}
+
+type signInResponsePayload {
+  status: Float!
+  message: String!
+}
+
+type UserPayload {
+  accesstoken: String!
+  response: signInResponsePayload!
+}
+
+type Query {
+  findAllPosts: [Posts!]!
+  getPosts(search: String!): [Posts!]!
+  hello: String!
+}
+
+type Mutation {
+  createPosts(createPostDto: CreatePostDto!): PostPayload!
+  updatePost(id: Float!, updatePostDto: UpdatePostDto!): PostPayload!
+  deletePost(id: Float!): PostPayload!
+  createComment(createCommentDto: CreateCommentDto!): Comments!
+  signUp(createUserInput: CreateUserInput!): Users!
+  signIn(user: SignInUserInput!): UserPayload!
+}
+
+input CreatePostDto {
+  text: String!
+}
+
+input UpdatePostDto {
+  text: String!
+}
+
+input CreateCommentDto {
+  text: String!
+  postId: Float!
+  parentId: Float
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+  role: Role = User
+}
+
+input SignInUserInput {
+  email: String!
+  password: String!
+}
