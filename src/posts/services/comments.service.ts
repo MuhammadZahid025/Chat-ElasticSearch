@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/users/entities/users.entity';
-import { Repository } from 'typeorm';
+import { Equal, IsNull, Repository } from 'typeorm';
 import { CreateCommentDto } from '../dtos/createCommentDto';
 import { Comments } from '../enitities/comments.entity';
 import { PostsService } from './posts.service';
@@ -64,6 +64,27 @@ export class CommentService {
    */
 
   async findByPostId(postsId: number): Promise<Comments[]> {
-    return await this.commentRepository.find({ where: { postsId } });
+    const result = await this.commentRepository.find({
+      where: { postsId, parentId: IsNull() },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    return result;
+  }
+
+  async replyCount(id: number): Promise<number> {
+    const count = await this.commentRepository.count({ where: { parentId: Equal(id) } });
+    console.log(count);
+    return count;
+  }
+
+  async getReplies(id: number): Promise<Comments[]> {
+    const replies = this.commentRepository.find({
+      where: {
+        parentId: Equal(id),
+      },
+    });
+    return replies;
   }
 }

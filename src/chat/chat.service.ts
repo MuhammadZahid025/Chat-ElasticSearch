@@ -45,11 +45,15 @@ export class ChatService {
   async saveMessage(message: string, authorId: string) {
     try {
       const newMessage = await this.messagesRepository.save({ message, authorId });
-      console.log('--------->>', newMessage);
       // await this.messagesRepository.save(newMessage);
       return newMessage;
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  async joinRoom(roomName: string) {
+    try {
+    } catch (error) {}
   }
 }

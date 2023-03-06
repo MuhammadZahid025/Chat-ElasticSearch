@@ -17,7 +17,7 @@ export class Comments {
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  userId: number;
+  userId: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
@@ -25,11 +25,11 @@ export class Comments {
 
   @CreateDateColumn({ type: 'timestamptz', nullable: false })
   @Field({ nullable: false })
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: false })
   @Field({ nullable: false })
-  updatedAt: string;
+  updatedAt: Date;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
@@ -44,6 +44,9 @@ export class Comments {
   @ManyToOne(() => Comments)
   parent: Comments;
 
-  @Field(() => Comments, { nullable: true })
-  reply: Comments;
+  // @Field(() => Comments, { nullable: true })
+  // reply: Comments;
+
+  @Field(() => Number, { nullable: true })
+  replyCount: number;
 }

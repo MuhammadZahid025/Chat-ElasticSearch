@@ -5,13 +5,19 @@
 type Comments {
   id: Float!
   text: String!
-  userId: Float
+  userId: String
   postsId: Float
-  createdAt: String!
-  updatedAt: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   parentId: Float
-  reply: Comments
+  replyCount: Float
+  user: Users!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Users {
   name: String!
@@ -30,16 +36,23 @@ enum Role {
 
 type Posts {
   id: Float!
+  title: String!
   text: String!
-  userId: Float
+  userId: String
   createdAt: String!
   updatedAt: String!
-  comments: [Comments]
+  comments: [Comments!]!
+  user: Users!
 }
 
 type CreatePostsResponsePayload {
   status: Float!
   message: String!
+}
+
+type AllPostsType {
+  items: [Posts!]!
+  total: Float!
 }
 
 type ResponseObject {
@@ -64,9 +77,16 @@ type UserPayload {
 }
 
 type Query {
-  findAllPosts: [Posts!]!
+  findAllPosts(paginationInput: PaginateInput!): AllPostsType!
   getPosts(search: String!): [Posts!]!
+  findPostById(id: Float!): PostPayload!
+  replies(commentId: Float!): [Comments!]!
   hello: String!
+}
+
+input PaginateInput {
+  skip: Int!
+  take: Int!
 }
 
 type Mutation {
@@ -79,6 +99,7 @@ type Mutation {
 }
 
 input CreatePostDto {
+  title: String!
   text: String!
 }
 

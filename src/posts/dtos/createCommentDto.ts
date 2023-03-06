@@ -11,3 +11,9 @@ export class CreateCommentDto {
   @Field({ nullable: true })
   parentId?: number;
 }
+
+@InputType()
+export class GetReplies {
+  @Field()
+  id: number;
+}

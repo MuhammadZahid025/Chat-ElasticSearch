@@ -1,5 +1,8 @@
 export interface PostSearchBody {
   id: number;
+  title: string;
   text: string;
-  userId: number;
+  userId: string;
+  createdAt: string;
+  userName: string;
 }

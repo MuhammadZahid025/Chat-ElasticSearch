@@ -1,18 +1,17 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchService } from 'src/search/search.service';
 import { Users } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import { CreatePostDto, UpdatePostDto } from '../dtos/createPost.dto';
+import { AllPostsType, CreatePostDto, PaginateInput, UpdatePostDto } from '../dtos/createPost.dto';
 import { Posts } from '../enitities/post.entity';
 // import { PostProvider } from '../../search/client';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(Posts)
-    private postRepository: Repository<Posts>,
+    @InjectRepository(Posts) private postRepository: Repository<Posts>,
     private readonly userService: UsersService,
     private readonly searchService: SearchService, // private readonly postProvider: PostProvider,
   ) {}
@@ -26,8 +25,9 @@ export class PostsService {
 
   async createPost(createPostDto: CreatePostDto, user: Users): Promise<Posts> {
     try {
-      const { text } = createPostDto;
+      const { text, title } = createPostDto;
       const newPost = this.postRepository.create({
+        title,
         text,
         userId: user?.id,
       });
@@ -88,11 +88,18 @@ export class PostsService {
    * @returns all posts
    */
 
-  async findAllPosts(): Promise<Posts[]> {
+  async findAllPosts(paginationInput: PaginateInput): Promise<AllPostsType> {
     try {
-      console.log('-------->Test');
-      const allPosts = this.postRepository.find();
-      return allPosts;
+      const { skip, take } = paginationInput;
+      const [items, total] = await this.postRepository.findAndCount({
+        order: { createdAt: 'DESC' },
+        skip: skip,
+        take: take,
+      });
+      return {
+        items,
+        total,
+      };
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
@@ -105,7 +112,15 @@ export class PostsService {
    */
 
   async findPostById(postId: number): Promise<Posts> {
-    return this.postRepository.findOne({ where: { id: postId } });
+    try {
+      const post = await this.postRepository.findOne({ where: { id: postId } });
+      if (!post) {
+        throw new NotFoundException('Post not found');
+      }
+      return post;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   /**
@@ -114,14 +129,15 @@ export class PostsService {
    * @returns for posts
    */
 
-  // async searchForPosts(text: string): Promise<Posts[]> {
-  //   try {
-  //     const results = await this.searchService.search(text);
-  //     const ids = results.map((result) => result.id);
-  //     if (!ids.length) {
-  //       return [];
-  //     }
-  //     return this.postRepository.find({ where: { id: In(ids) } });
-  //   } catch (error) {}
-  // }
+  async searchForPosts(text: string): Promise<Posts[]> {
+    try {
+      const results = await this.searchService.search(text);
+      return results;
+      // const ids = results.map((result) => result.id);
+      // if (!ids.length) {
+      //   return [];
+      // }
+      // return this.postRepository.find({ where: { id: In(ids) } });
+    } catch (error) {}
+  }
 }

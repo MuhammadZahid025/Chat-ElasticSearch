@@ -1,5 +1,5 @@
 import { Client } from '@elastic/elasticsearch';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Posts } from 'src/posts/enitities/post.entity';
 import { PostSearchBody } from './dtos/search.input';
 import { PostSearchResult } from './dtos/searchResult.payload';
@@ -21,12 +21,15 @@ export class SearchService {
         index: this.index,
         body: {
           id: post.id,
+          title: post.title,
           text: post.text,
           userId: post.userId,
+          createdAt: post.createdAt,
+          userName: post.user.name,
         },
       });
     } catch (error) {
-      throw error;
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -44,14 +47,11 @@ export class SearchService {
           query: {
             multi_match: {
               query: text,
-              fields: ['text'],
+              fields: ['text', 'title'],
             },
           },
         },
       });
-      // console.log('result', result);
-      // console.log('result', result.hits);
-      // console.log('result', result.hits.hits);
       const hits = result.hits.hits;
       return hits.map((item) => item._source);
     } catch (error) {

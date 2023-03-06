@@ -10,13 +10,17 @@ export class Posts {
   @Field()
   id: number;
 
+  @Column({ nullable: false })
+  @Field({ nullable: false })
+  title: string;
+
   @Column()
   @Field()
   text: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  userId: number;
+  userId: string;
 
   @CreateDateColumn({ type: 'timestamptz', nullable: false })
   @Field({ nullable: false })
@@ -30,6 +34,6 @@ export class Posts {
   user: Users;
 
   @OneToMany(() => Comments, (comments) => comments.posts)
-  @Field(() => [Comments], { nullable: 'itemsAndList' })
+  @Field(() => [Comments])
   comments: Comments[];
 }

@@ -59,7 +59,7 @@ export class UsersService {
       }
       const matchedPassword = await bcrypt.compare(password, userInDb.password);
       if (userInDb && matchedPassword) {
-        const payload = { email };
+        const payload = { email, id: userInDb.id };
         const accesstoken = this.jwtService.sign(payload);
         return {
           accesstoken,
@@ -114,7 +114,7 @@ export class UsersService {
    * @param id
    * @returns user by id
    */
-  async findUserById(id: number): Promise<Users> {
+  async findUserById(id: string): Promise<Users> {
     return this.usersRepository.findOne({ where: { id } });
   }
 }

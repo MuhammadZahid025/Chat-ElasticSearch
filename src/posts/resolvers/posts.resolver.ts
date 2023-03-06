@@ -1,11 +1,12 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/customDecorators/currentUser.decorator';
 import { Users } from 'src/users/entities/users.entity';
 import { Role } from 'src/users/enums/role.enum';
 import { JwtAuthGuard } from 'src/users/guards/jwt.guard';
 import { RoleGuard } from 'src/users/guards/role.guard';
-import { CreatePostDto, UpdatePostDto } from '../dtos/createPost.dto';
+import { UsersService } from 'src/users/users.service';
+import { AllPostsType, CreatePostDto, PaginateInput, UpdatePostDto } from '../dtos/createPost.dto';
 import { PostPayload } from '../dtos/post.payload';
 import { Posts } from '../enitities/post.entity';
 import { CommentService } from '../services/comments.service';
@@ -13,7 +14,11 @@ import { PostsService } from '../services/posts.service';
 
 @Resolver(() => Posts)
 export class PostsResolver {
-  constructor(private readonly postsService: PostsService, private readonly commentService: CommentService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly commentService: CommentService,
+    private readonly userService: UsersService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Mutation(() => PostPayload)
@@ -50,19 +55,25 @@ export class PostsResolver {
     };
   }
 
-  @UseGuards(JwtAuthGuard, RoleGuard(Role.User))
-  @Query(() => [Posts])
-  async findAllPosts(): Promise<Posts[]> {
-    const posts = await this.postsService.findAllPosts();
+  @UseGuards(JwtAuthGuard)
+  @Query(() => AllPostsType)
+  async findAllPosts(@Args('paginationInput') paginationInput: PaginateInput): Promise<AllPostsType> {
+    const posts = await this.postsService.findAllPosts(paginationInput);
     return posts;
   }
 
+  @ResolveField(() => Users)
+  async user(@Parent() post: Posts) {
+    const user = this.userService.findUserById(post.userId);
+    return user;
+  }
+
   @Query(() => [Posts])
-  async getPosts(@Args('search') search: string) {
+  async getPosts(@Args('search') search: string): Promise<Posts[]> {
     if (search) {
-      // return this.postsService.searchForPosts(search);
+      return this.postsService.searchForPosts(search);
     }
-    return this.postsService.findAllPosts();
+    // return this.postsService.findAllPosts();
   }
 
   @ResolveField(() => [Comment])
@@ -70,5 +81,18 @@ export class PostsResolver {
     if (post?.id) {
       return await this.commentService.findByPostId(post?.id);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Query(() => PostPayload)
+  async findPostById(@Args('id') id: number): Promise<PostPayload> {
+    const post = await this.postsService.findPostById(id);
+    return {
+      post,
+      response: {
+        status: 200,
+        message: `Success`,
+      },
+    };
   }
 }

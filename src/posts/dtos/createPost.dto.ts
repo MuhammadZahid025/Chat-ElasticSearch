@@ -1,8 +1,11 @@
-import { InputType, Field, ObjectType } from '@nestjs/graphql';
+import { InputType, Field, ObjectType, Int } from '@nestjs/graphql';
 import { Posts } from '../enitities/post.entity';
 
 @InputType()
 export class CreatePostDto {
+  @Field()
+  title: string;
+
   @Field()
   text: string;
 }
@@ -29,4 +32,21 @@ export class CreatePostsPayload {
 
   @Field()
   response?: CreatePostsResponsePayload;
+}
+
+@InputType()
+export class PaginateInput {
+  @Field(() => Int)
+  skip?: number;
+
+  @Field(() => Int)
+  take?: number;
+}
+
+@ObjectType()
+export class AllPostsType {
+  @Field(() => [Posts])
+  items: Posts[];
+  @Field()
+  total: number;
 }
