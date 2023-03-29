@@ -29,7 +29,7 @@ export class UsersService {
 
       if (userAlreadyExists) {
         throw new ForbiddenException({
-          status: HttpStatus.FORBIDDEN,
+          status: HttpStatus.BAD_REQUEST,
           error: 'User already exists with this email, Please Signin',
         });
       }

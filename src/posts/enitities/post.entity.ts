@@ -20,6 +20,18 @@ export class Posts {
 
   @Column({ nullable: true })
   @Field({ nullable: true })
+  image: string;
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  tag: string;
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  minutesToRead: string;
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   userId: string;
 
   @CreateDateColumn({ type: 'timestamptz', nullable: false })

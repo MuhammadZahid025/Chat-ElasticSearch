@@ -38,6 +38,9 @@ type Posts {
   id: Float!
   title: String!
   text: String!
+  image: String
+  tag: String
+  minutesToRead: String
   userId: String
   createdAt: String!
   updatedAt: String!
@@ -78,7 +81,8 @@ type UserPayload {
 
 type Query {
   findAllPosts(paginationInput: PaginateInput!): AllPostsType!
-  getPosts(search: String!): [Posts!]!
+  getPosts(search: String!, paginationInput: PaginateInput!): [Posts!]!
+  myPosts(paginationInput: PaginateInput!): [Posts!]!
   findPostById(id: Float!): PostPayload!
   replies(commentId: Float!): [Comments!]!
   hello: String!
@@ -101,6 +105,7 @@ type Mutation {
 input CreatePostDto {
   title: String!
   text: String!
+  image: String!
 }
 
 input UpdatePostDto {

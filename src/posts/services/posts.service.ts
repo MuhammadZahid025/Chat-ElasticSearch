@@ -140,4 +140,9 @@ export class PostsService {
       // return this.postRepository.find({ where: { id: In(ids) } });
     } catch (error) {}
   }
+
+  async myPosts(user: Users): Promise<Posts[]> {
+    const myPosts = await this.postRepository.find({ where: { userId: user.id } });
+    return myPosts;
+  }
 }

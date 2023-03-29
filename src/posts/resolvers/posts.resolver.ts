@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/customDecorators/currentUser.decorator';
 import { Users } from 'src/users/entities/users.entity';
 import { Role } from 'src/users/enums/role.enum';
@@ -55,7 +55,7 @@ export class PostsResolver {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Query(() => AllPostsType)
   async findAllPosts(@Args('paginationInput') paginationInput: PaginateInput): Promise<AllPostsType> {
     const posts = await this.postsService.findAllPosts(paginationInput);
@@ -69,11 +69,17 @@ export class PostsResolver {
   }
 
   @Query(() => [Posts])
-  async getPosts(@Args('search') search: string): Promise<Posts[]> {
+  async getPosts(@Args('search') search: string, @Args('paginationInput') paginationInput: PaginateInput): Promise<Posts[]> {
     if (search) {
       return this.postsService.searchForPosts(search);
     }
     // return this.postsService.findAllPosts();
+  }
+  @UseGuards(JwtAuthGuard)
+  @Query(() => [Posts])
+  async myPosts(@Args('paginationInput') paginationInput: PaginateInput, @CurrentUser() user: Users): Promise<Posts[]> {
+    const myPosts = await this.postsService.myPosts(user);
+    return myPosts;
   }
 
   @ResolveField(() => [Comment])

@@ -8,6 +8,9 @@ export class CreatePostDto {
 
   @Field()
   text: string;
+
+  @Field()
+  image?: string;
 }
 
 @InputType()
