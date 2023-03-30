@@ -23,6 +23,7 @@ type Users {
   name: String!
   email: String!
   password: String!
+  avatar: String
   createdAt: String!
   updatedAt: String!
   roles: Role
@@ -81,8 +82,8 @@ type UserPayload {
 
 type Query {
   findAllPosts(paginationInput: PaginateInput!): AllPostsType!
-  getPosts(search: String!, paginationInput: PaginateInput!): [Posts!]!
-  myPosts(paginationInput: PaginateInput!): [Posts!]!
+  getPosts(search: String!): [Posts!]!
+  myPosts(paginationInput: PaginateInput!): AllPostsType!
   findPostById(id: Float!): PostPayload!
   replies(commentId: Float!): [Comments!]!
   hello: String!
@@ -100,12 +101,15 @@ type Mutation {
   createComment(createCommentDto: CreateCommentDto!): Comments!
   signUp(createUserInput: CreateUserInput!): Users!
   signIn(user: SignInUserInput!): UserPayload!
+  updateUser(updateUser: UpdateUser!): Users!
 }
 
 input CreatePostDto {
   title: String!
   text: String!
   image: String!
+  tag: String!
+  minutesToRead: String!
 }
 
 input UpdatePostDto {
@@ -127,5 +131,11 @@ input CreateUserInput {
 
 input SignInUserInput {
   email: String!
+  password: String!
+}
+
+input UpdateUser {
+  avatar: String!
+  name: String!
   password: String!
 }

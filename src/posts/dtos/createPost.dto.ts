@@ -11,6 +11,12 @@ export class CreatePostDto {
 
   @Field()
   image?: string;
+
+  @Field()
+  tag?: string;
+
+  @Field()
+  minutesToRead?: string;
 }
 
 @InputType()

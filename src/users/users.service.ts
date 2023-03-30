@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserInput, SignInUserInput, UserPayload } from './dtos/users.dto';
+import { CreateUserInput, SignInUserInput, UpdateUser, UserPayload } from './dtos/users.dto';
 import { Users } from './entities/users.entity';
 
 @Injectable()
@@ -106,6 +106,14 @@ export class UsersService {
       return userinfo;
     } catch (error) {
       return error.message;
+    }
+  }
+
+  async updateUser(updateUser: UpdateUser, user: Users): Promise<any> {
+    const { avatar, name, password } = updateUser;
+    const findUser = this.findUserById(user.id);
+    if (findUser) {
+      return await this.usersRepository.update({ id: user.id }, { avatar, name, password });
     }
   }
 

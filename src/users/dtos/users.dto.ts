@@ -52,3 +52,13 @@ export class UserPayload {
   @Field()
   response?: signInResponsePayload;
 }
+
+@InputType()
+export class UpdateUser {
+  @Field()
+  avatar?: string;
+  @Field()
+  name?: string;
+  @Field()
+  password?: string;
+}

@@ -27,6 +27,10 @@ export class Users {
   @Field()
   password: string;
 
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  avatar: string;
+
   @CreateDateColumn({ type: 'timestamptz', nullable: false })
   @Field({ nullable: false })
   createdAt: string;

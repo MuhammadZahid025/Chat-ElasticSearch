@@ -25,11 +25,14 @@ export class PostsService {
 
   async createPost(createPostDto: CreatePostDto, user: Users): Promise<Posts> {
     try {
-      const { text, title } = createPostDto;
+      const { text, title, image, minutesToRead, tag } = createPostDto;
       const newPost = this.postRepository.create({
         title,
         text,
         userId: user?.id,
+        image,
+        minutesToRead,
+        tag,
       });
       newPost.user = user;
       await this.postRepository.save(newPost);
@@ -141,8 +144,17 @@ export class PostsService {
     } catch (error) {}
   }
 
-  async myPosts(user: Users): Promise<Posts[]> {
-    const myPosts = await this.postRepository.find({ where: { userId: user.id } });
-    return myPosts;
+  async myPosts(user: Users, paginationInput: PaginateInput): Promise<AllPostsType> {
+    const { skip, take } = paginationInput;
+    const [items, total] = await this.postRepository.findAndCount({
+      where: { userId: user.id },
+      order: { createdAt: 'DESC' },
+      skip: skip,
+      take: take,
+    });
+    return {
+      items,
+      total,
+    };
   }
 }
